@@ -28,6 +28,26 @@
 - A small floating round button lets you pause/resume watching on demand, drag it anywhere, and long-press to cycle the delay — no need to open the app.
 - Opacity is fully adjustable (0–100%) via a slider, so you can dial in exactly how solid the scrim looks. Real-world tested: **90% opacity blocks a side-angle shoulder-surfer completely**, even readable text is unrecoverable from an angle.
 - Optional per-app exclusion list — pick apps that should *never* trigger the blur (e.g. your launcher).
+  ## 📸 In action
+
+**Watching — idle timer counting down**
+
+
+![watching](docs/screenshot-idle.jpg)
+
+
+
+**Paused — tapped the floating button**
+
+
+![paused](docs/screenshot-paused.jpg)
+
+
+
+**Blur triggered after idle timeout**
+
+
+![blurred](docs/screenshot-blurred.jpg)
 
 ## 🔒 How it works (the actual trick)
 
