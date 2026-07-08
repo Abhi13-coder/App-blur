@@ -16,15 +16,6 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 
-/**
- * Two overlay windows are managed here:
- *  1. A full-screen, non-touchable scrim window that watches ACTION_OUTSIDE touches
- *     (system-wide idle detection with zero accessibility/usage-stats requirement).
- *  2. A small round, touchable, draggable toggle button on top of everything.
- *
- * Per-app exclusion is done via UsageStatsManager polling (needs a one-time
- * "usage access" grant, separate from the overlay permission).
- */
 class BlurOverlayService : Service() {
 
     companion object {
@@ -52,12 +43,9 @@ class BlurOverlayService : Service() {
     private val blurRunnable = Runnable { maybeShowBlur() }
     private val foregroundPollRunnable = object : Runnable {
         override fun run() {
-            // Only matters when a blur would otherwise be about to show; cheap enough to poll always.
             mainHandler.postDelayed(this, 2000)
         }
     }
-
-    private var lastForegroundPkg: String? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -101,8 +89,6 @@ class BlurOverlayService : Service() {
         }
     }
 
-    // ---------- Scrim (blur) window ----------
-
     private fun addScrim() {
         val overlayType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -127,7 +113,7 @@ class BlurOverlayService : Service() {
         }
 
         scrimView = View(this).apply {
-            setBackgroundColor(0xCC101014.toInt())
+            setBackgroundColor(scrimColor())
             visibility = View.GONE
             setOnClickListener { hideBlur() }
         }
@@ -163,7 +149,6 @@ class BlurOverlayService : Service() {
         if (excluded.isNotEmpty()) {
             val fg = ForegroundAppDetector.currentForegroundPackage(this)
             if (fg != null && excluded.contains(fg)) {
-                // Excluded app is in front - don't blur, just check again after the same delay.
                 mainHandler.postDelayed(blurRunnable, timeoutMs)
                 return
             }
@@ -171,8 +156,15 @@ class BlurOverlayService : Service() {
         showBlur()
     }
 
+    private fun scrimColor(): Int {
+        val percent = Prefs.getOpacityPercent(this)
+        val alpha = (percent * 255 / 100).coerceIn(0, 255)
+        return (alpha shl 24) or 0x101014
+    }
+
     private fun showBlur() {
         blurred = true
+        scrimView.setBackgroundColor(scrimColor())
         scrimView.visibility = View.VISIBLE
         scrimView.alpha = 0f
         scrimView.animate().alpha(1f).setDuration(250).start()
@@ -198,8 +190,6 @@ class BlurOverlayService : Service() {
         }
     }
 
-    // ---------- Floating toggle button ----------
-
     private fun addToggleButton() {
         val overlayType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -220,7 +210,7 @@ class BlurOverlayService : Service() {
         }
 
         buttonView = TextView(this).apply {
-            text = "\u25C9" // filled circle glyph, doubles as a simple icon
+            text = "\u25C9"
             textSize = 20f
             gravity = android.view.Gravity.CENTER
             setTextColor(0xFFFFFFFF.toInt())
@@ -294,8 +284,6 @@ class BlurOverlayService : Service() {
         resetTimer()
     }
 
-    // ---------- Notification ----------
-
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -319,4 +307,6 @@ class BlurOverlayService : Service() {
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopPending)
             .build()
     }
-}
+}    
+
+                        
