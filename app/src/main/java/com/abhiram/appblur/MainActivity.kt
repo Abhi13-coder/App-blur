@@ -122,6 +122,12 @@ class MainActivity : AppCompatActivity() {
         }
         root.addView(stopBtn)
 
+        val aboutBtn = Button(this).apply {
+            text = "About"
+            setOnClickListener { startActivity(Intent(this@MainActivity, AboutActivity::class.java)) }
+        }
+        root.addView(aboutBtn)
+
         val note = TextView(this).apply {
             text = "\nOnce running, a small round button floats on screen. " +
                     "Tap it to pause/resume watching, drag to move it, long-press to cycle the delay."
