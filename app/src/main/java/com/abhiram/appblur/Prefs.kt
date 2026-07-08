@@ -24,6 +24,9 @@ object Prefs {
     fun setExcludedApps(ctx: Context, packages: Set<String>) =
         sp(ctx).edit().putStringSet("excluded_apps", packages).apply()
 
+    fun getOpacityPercent(ctx: Context): Int = sp(ctx).getInt("opacity_percent", 95)
+    fun setOpacityPercent(ctx: Context, v: Int) = sp(ctx).edit().putInt("opacity_percent", v).apply()
+
     val TIMEOUT_PRESETS = intArrayOf(5, 10, 15, 20, 30)
 
     fun nextTimeout(current: Int): Int {
