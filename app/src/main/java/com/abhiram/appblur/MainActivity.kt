@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         root.addView(timeoutLabel)
 
         seekBar = SeekBar(this).apply {
-            max = 25 // maps to 5..30 seconds
+            max = 25
             progress = timeoutSeconds - 5
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -60,6 +60,25 @@ class MainActivity : AppCompatActivity() {
             })
         }
         root.addView(seekBar)
+
+        val opacityLabel = TextView(this).apply {
+            text = "Blur opacity: ${Prefs.getOpacityPercent(this@MainActivity)}%"
+        }
+        root.addView(opacityLabel)
+
+        val opacitySeekBar = SeekBar(this).apply {
+            max = 100
+            progress = Prefs.getOpacityPercent(this@MainActivity)
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                    opacityLabel.text = "Blur opacity: ${progress}%"
+                    Prefs.setOpacityPercent(this@MainActivity, progress)
+                }
+                override fun onStartTrackingTouch(sb: SeekBar?) {}
+                override fun onStopTrackingTouch(sb: SeekBar?) {}
+            })
+        }
+        root.addView(opacitySeekBar)
 
         val sectionPerms = TextView(this).apply {
             text = "\nPermissions (one-time each)"
@@ -169,4 +188,4 @@ class MainActivity : AppCompatActivity() {
         startService(intent)
         refreshStatus()
     }
-}
+}                        
