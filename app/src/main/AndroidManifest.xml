@@ -41,6 +41,11 @@
             android:name=".AppListActivity"
             android:exported="false"
             android:label="Excluded apps" />
+        
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:label="About" />
 
         <service
             android:name=".BlurOverlayService"
